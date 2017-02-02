@@ -30,4 +30,5 @@
 (def-redis-test equality "s:"
   (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
   (.set j "s:b" (json/json-str {"x" 1, "y" 2}))
-  (is (= {"a" {"a" 1, "b" 2}, "b" {"x" 1, "y" 2}} rm)))
+  (is (= {"a" {"a" 1, "b" 2}, "b" {"x" 1, "y" 2}} rm))
+  (is (= rm {"a" {"a" 1, "b" 2}, "b" {"x" 1, "y" 2}})))

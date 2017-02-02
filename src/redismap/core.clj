@@ -139,7 +139,14 @@
       :else
       (.deserialize serializer (.get jedis (key-of prefix k)))))
   
-  (valAt [this k not_found] (if-let [v (.valAt this k)] v not_found)))
+  (valAt [this k not_found] (if-let [v (.valAt this k)] v not_found))
+
+  clojure.lang.MapEquivalence
+  
+  java.util.Map
+  (size [this] (.count this))
+  (isEmpty [this] (<= (.count this)))
+  )
 
 
 
