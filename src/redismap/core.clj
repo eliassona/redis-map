@@ -42,6 +42,29 @@
                (.keys jedis (key-of prefix "*")))))
 
 
+(defn entries-of 
+  ([jedis prefix serializer assocMap]
+  (loop [entries []
+         assoc-map assocMap
+         ks (.keys jedis (key-of prefix "*"))]
+    (if (not (empty? ks))
+      (let [pk (first ks)
+            k (key-of pk)]
+        (if (contains? assocMap k)
+          (recur (conj entries (AbstractMap$SimpleEntry. k (get assocMap k))) (dissoc assoc-map k) (rest ks))
+          (recur (conj entries (AbstractMap$SimpleEntry. k (.deserialize serializer (.get jedis pk)))) assoc-map (rest ks))))
+      [entries assoc-map])))
+  ([jedis prefix serializer assocMap withouts]
+    (let [[entries assoc-map] (entries-of jedis prefix serializer assocMap)]
+      (concat 
+        (map #(AbstractMap$SimpleEntry. (key %) (val %)) assoc-map)
+        (filter
+          (fn [e]
+            (not (contains? withouts (.getKey e))))
+          entries)))))
+
+
+
 (deftype RedisPersistentMap [jedis prefix serializer withouts assocMap]
   clojure.lang.IFn
   (invoke [this k]
@@ -98,7 +121,7 @@
   
   (equiv [this o]
     (if (= (.count this) (count o))
-      (every? (fn [e] (= (val (dbg e)) (dbg (get o (dbg (key e)))))) this)
+      (every? (fn [e] (= (val e) (get o (key e)))) this)
       false))
   
   clojure.lang.Seqable
