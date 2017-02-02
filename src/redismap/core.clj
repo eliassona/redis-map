@@ -102,7 +102,7 @@
       :else
       (true? (.keys jedis (key-of prefix k)))))
   
-  (entryAt [this k] (.get jedis (key-of prefix k)))
+  (entryAt [this k] (MapEntry. k (.get jedis (key-of prefix k))))
   
   clojure.lang.IPersistentCollection
   
@@ -117,7 +117,8 @@
   
   (cons [this [k v]] (dbg this))
   
-  (empty [this] this)
+  (empty [this] 
+    (RedisPersistentMap. jedis prefix serializer (into #{} (keys this)) {}))
   
   (equiv [this o]
     (if (= (.count this) (count o))
