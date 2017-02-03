@@ -16,7 +16,12 @@
          ~@code
          (finally 
            (.close ~'j)))))) 
-  
+
+(defn equivalence [expected actual]
+  (is (= expected actual))
+  (is (= actual expected))
+  (is (= actual actual)))
+
 
 (def-redis-test count-keys "s:"
   (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
@@ -30,5 +35,31 @@
 (def-redis-test equality "s:"
   (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
   (.set j "s:b" (json/json-str {"x" 1, "y" 2}))
-  (is (= {"a" {"a" 1, "b" 2}, "b" {"x" 1, "y" 2}} rm))
-  (is (= rm {"a" {"a" 1, "b" 2}, "b" {"x" 1, "y" 2}})))
+  (is (equivalence {"a" {"a" 1, "b" 2}, "b" {"x" 1, "y" 2}} rm)))
+
+
+(def-redis-test assoc-test "s:"
+  (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
+  (.set j "s:b" (json/json-str {"x" 1, "y" 2}))
+  (let [assoc-rm (assoc rm "c" 10)]
+    (is (equivalence {"b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} rm))
+    (is (equivalence {"c" 10, "b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} assoc-rm))))
+    
+
+(def-redis-test dissoc-test "s:"
+  (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
+  (.set j "s:b" (json/json-str {"x" 1, "y" 2}))
+  (let [dissoc-rm (dissoc rm "a")]
+    (is (equivalence {"b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} rm))    
+    (is (equivalence {"b" {"x" 1, "y" 2}} dissoc-rm))))
+
+
+(def-redis-test assoc-dissoc-test "s:"
+  (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
+  (.set j "s:b" (json/json-str {"x" 1, "y" 2}))
+  (let [assoc-rm (assoc rm "c" 10)
+        dissoc-rm (dissoc rm "c")]
+    (is (equivalence {"b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} rm))
+    (is (equivalence {"c" 10, "b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} assoc-rm))
+    (is (equivalence {"b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} dissoc-rm))))
+
