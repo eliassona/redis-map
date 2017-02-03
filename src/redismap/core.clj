@@ -149,5 +149,10 @@
 
 
 
-(defn redis-map [jedis prefix serializer]
-  (RedisPersistentMap. jedis prefix serializer #{} {}))
+(defn redis-map 
+  ([jedis prefix serializer]
+    (RedisPersistentMap. jedis prefix serializer #{} {}))
+  ([jedis prefix]
+    (redis-map jedis prefix (JsonSerializer.)))
+  ([jedis]
+    (redis-map jedis "p:")))

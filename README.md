@@ -1,8 +1,20 @@
 # redismap
 
-A Clojure library designed to ... well, that part is up to you.
+Represents redis as a clojure persistent map.
+
 
 ## Usage
+
+```clojure
+(use 'redismap.core)
+(import 'redis.clients.jedis.Jedis)
+(def m (redis-map (Jedis.))) ;serialize to json by default
+;do map stuff
+(def nm (assoc m "x" 10))
+;store the change in redis
+(store! nm)
+
+```
 
 FIXME
 
