@@ -10,6 +10,10 @@
      (println "dbg:" '~body "=" x#)
      x#))
 
+#_(defprotocol IStorage
+   (s-read [this k])
+   (s-keys [this])
+   )
 
 (defprotocol ISerializer
   (serialize [this data])
