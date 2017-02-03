@@ -63,3 +63,18 @@
     (is (equivalence {"c" 10, "b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} assoc-rm))
     (is (equivalence {"b" {"x" 1, "y" 2}, "a" {"a" 1, "b" 2}} dissoc-rm))))
 
+
+(def-redis-test persistence-test "s:"
+  (.set j "s:a" (json/json-str {"a" 1, "b" 2}))
+  (.set j "s:b" (json/json-str {"x" 1, "y" 2}))
+  (let [assoc-rm (assoc rm "c" 10)
+        dissoc-rm (dissoc rm "b")]
+    (store! dissoc-rm)
+    (is (equivalence {"a" {"a" 1, "b" 2}} rm))
+    (is (equivalence {"a" {"a" 1, "b" 2}} (redis-map (Jedis.) "s:" (JsonSerializer.))))
+    ))
+    
+    
+
+
+

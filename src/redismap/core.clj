@@ -15,6 +15,10 @@
   (serialize [this data])
   (deserialize [this data]))
 
+(defprotocol IPersistence
+  (store! [this]))
+
+
 (deftype JsonSerializer []
   ISerializer
   (serialize [this data] (json/json-str data))
@@ -147,6 +151,16 @@
   (size [this] (.count this))
   (isEmpty [this] (<= (.count this)))
   (get [this k] (.valAt this k))
+  
+  IPersistence
+  (store! [this]
+    (doseq [e assocMap]
+      (.set jedis (key-of prefix (key e)) (.serialize serializer (val e))))
+    (doseq [k withouts]
+      (.del jedis (key-of prefix k)))
+      
+    )
+  
   )
 
 
