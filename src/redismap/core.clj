@@ -100,7 +100,7 @@
       (contains? withouts k)
       false
       :else
-      (true? (.keys jedis (key-of prefix k)))))
+      (= (count (.keys jedis (key-of prefix k))) 1)))
   
   (entryAt [this k] (MapEntry. k (.get jedis (key-of prefix k))))
   
@@ -146,6 +146,7 @@
   java.util.Map
   (size [this] (.count this))
   (isEmpty [this] (<= (.count this)))
+  (get [this k] (.valAt this k))
   )
 
 
