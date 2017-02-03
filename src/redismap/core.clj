@@ -30,22 +30,6 @@
   ([prefixed-key]
    (second (clojure.string/split prefixed-key #":")))) 
    
-
-
-(defn entries-of [jedis prefix serializer assocMap withouts]
-  (filter
-    (fn [e]
-      (not (contains? withouts (.getKey e))))
-      (map 
-        (fn [k] 
-          (AbstractMap$SimpleEntry. 
-            (key-of k)
-            (if (contains? assocMap k)
-              (get assocMap k)
-              (.deserialize serializer (.get jedis k)))))
-               (.keys jedis (key-of prefix "*")))))
-
-
 (defn entries-of 
   ([jedis prefix serializer assocMap]
   (loop [entries []
