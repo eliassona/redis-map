@@ -19,8 +19,8 @@
 
 (deftype JsonSerializer []
   ISerializer
-  (serialize [this data] (json/json-str data))
-  (deserialize [this data] (json/read-str data)))
+  (serialize [this data] (when data (json/json-str data)))
+  (deserialize [this data] (when data (json/read-str data))))
   
 (defn redis-map 
   ([jedis prefix serializer]
